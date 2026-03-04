@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dev-server",
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": ["/c", "npx", "ts-node", "-r", "tsconfig-paths/register", "--project", "tsconfig.server.json", "server.ts"],
+      "port": 3000
+    }
+  ]
+}

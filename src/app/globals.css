@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-primary: #0a1628;
+  --bg-secondary: #1a2a4a;
+  --bg-card: #243456;
+  --text-primary: #e8edf5;
+  --text-secondary: #8899bb;
+  --accent-gold: #f0c040;
+  --accent-red: #e05050;
+  --accent-green: #40c080;
+  --accent-blue: #4080e0;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: system-ui, -apple-system, sans-serif;
+  overflow: hidden;
+}
+
+/* Card styling */
+.card-in-hand {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .card-in-hand:hover {
+    transform: translateY(-6px);
+  }
+}
+
+.card-in-hand.selected {
+  transform: translateY(-12px);
+  box-shadow: 0 0 8px rgba(240, 192, 64, 0.6);
+}
+
+.card-in-hand.staged {
+  transform: translateY(-12px);
+  box-shadow: 0 0 8px rgba(64, 192, 128, 0.6);
+}
+
+/* スクロールバー非表示 */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .card-in-hand.selected {
+    transform: translateY(-20px);
+    box-shadow: 0 0 12px rgba(240, 192, 64, 0.6);
+  }
+
+  .card-in-hand.staged {
+    transform: translateY(-20px);
+    box-shadow: 0 0 12px rgba(64, 192, 128, 0.6);
+  }
+
+  @media (hover: hover) {
+    .card-in-hand:hover {
+      transform: translateY(-8px);
+    }
+  }
+}
