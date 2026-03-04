@@ -613,7 +613,7 @@ export class GameEngine {
     if (allSelected) {
       // Add all selected rules
       const newRules: AdditionalRuleId[] = [];
-      for (const sel of this.ruleSelections.values()) {
+      for (const sel of Array.from(this.ruleSelections.values())) {
         if (sel.selectedRule && !this.state.activeRules.includes(sel.selectedRule)) {
           this.state.activeRules.push(sel.selectedRule);
           newRules.push(sel.selectedRule);
