@@ -50,12 +50,9 @@ export type AdditionalRuleId =
   | 'pair_swap'
   | 'sequence_steal'
   | 'same_suit_triple'
-  // === パッシブ型 (10個) ===
+  // === パッシブ型 (7個) ===
   | 'speed_round'
-  | 'hand_limit'
-  | 'comeback_boost'
   | 'joker_nerf'
-  | 'no_single'
   | 'transparency'
   | 'lucky_start'
   | 'escalation'

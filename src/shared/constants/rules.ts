@@ -378,7 +378,7 @@ export const ADDITIONAL_RULES: Record<AdditionalRuleId, AdditionalRuleDefinition
   },
 
   // ============================================================
-  // パッシブ型 (10個)
+  // パッシブ型 (7個)
   // ============================================================
   speed_round: {
     id: 'speed_round',
@@ -388,34 +388,10 @@ export const ADDITIONAL_RULES: Record<AdditionalRuleId, AdditionalRuleDefinition
     triggerCount: null,
     type: 'passive',
   },
-  hand_limit: {
-    id: 'hand_limit',
-    nameJa: '手札制限',
-    descriptionJa: '各ターン開始時、手札が10枚以上のプレイヤーは強制的に最弱カードを1枚捨てる。',
-    triggerRank: null,
-    triggerCount: null,
-    type: 'passive',
-  },
-  comeback_boost: {
-    id: 'comeback_boost',
-    nameJa: '逆転ブースト',
-    descriptionJa: '手札が最も多いプレイヤーは、ペア以上を出す時に追加で1枚多く出せる。',
-    triggerRank: null,
-    triggerCount: null,
-    type: 'passive',
-  },
   joker_nerf: {
     id: 'joker_nerf',
     nameJa: 'ジョーカー弱体',
     descriptionJa: 'ジョーカーを最後の1枚として出してあがることができなくなる。',
-    triggerRank: null,
-    triggerCount: null,
-    type: 'passive',
-  },
-  no_single: {
-    id: 'no_single',
-    nameJa: 'シングル禁止',
-    descriptionJa: '1枚出しが禁止され、必ずペア以上で出さなければならない。出せない場合はパス。',
     triggerRank: null,
     triggerCount: null,
     type: 'passive',

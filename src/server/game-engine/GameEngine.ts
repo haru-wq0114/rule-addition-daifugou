@@ -51,6 +51,9 @@ export class GameEngine {
   private turnTimerInterval: ReturnType<typeof setInterval> | null = null;
   private readonly TURN_DURATION = 30;
 
+  // Chain bonus tracking: consecutive plays without passing per player
+  private consecutivePlayCounts: Record<string, number> = {};
+
   constructor(
     roomId: string,
     playerIds: string[],
@@ -217,6 +220,9 @@ export class GameEngine {
       this.state.field.lastPlayParity = this.ruleEngine.getPlayParity(play);
     }
 
+    // 連鎖ボーナス: パスせずにカードを出した
+    this.trackChainBonus(playerId);
+
     // Update number lock
     this.updateLocks();
 
@@ -346,6 +352,8 @@ export class GameEngine {
 
     // Clear field if needed (8-cut, sandstorm, ambulance)
     if (postPlay.clearField) {
+      // エコーフィールド: 場が流れる前にボーナス付与
+      this.applyEchoFieldBonus();
       this.phaseManager.clearField(this.state);
       this.state.field.currentTurnPlayerId = playerId;
       // If the player who cleared has finished, give turn to next
@@ -411,6 +419,9 @@ export class GameEngine {
       data: { playerId },
     });
 
+    // 連鎖ボーナスリセット: パスしたのでカウントを0に
+    this.resetChainBonus(playerId);
+
     // サドンデス: 残り2人でパスしたら即大貧民
     const activePlayers = Object.values(this.state.players)
       .filter(p => p.finishOrder === null);
@@ -459,6 +470,8 @@ export class GameEngine {
     );
 
     if (allPassed && this.state.field.lastPlayerId) {
+      // エコーフィールド: 場が流れる前にボーナス付与
+      this.applyEchoFieldBonus();
       // Field clears - last player who played gets the turn
       this.phaseManager.clearField(this.state);
       let nextPlayer = this.state.field.lastPlayerId;
@@ -1067,6 +1080,52 @@ export class GameEngine {
       finalScores: { ...this.state.scores },
       finalRankings,
     };
+  }
+
+  /**
+   * エコーフィールド: 場が流れた時、最後に出されたカードのランクと同じカードを持っている人は+2点
+   */
+  private applyEchoFieldBonus(): void {
+    if (!this.state.activeRules.includes('echo_field')) return;
+    const lastPlay = this.state.field.currentPlay;
+    if (!lastPlay) return;
+
+    const lastRank = getNonJokerRank(lastPlay.cards);
+    if (lastRank === null) return;
+
+    for (const p of Object.values(this.state.players)) {
+      if (p.finishOrder !== null) continue;
+      const hasMatchingRank = p.hand.some(
+        c => isRegularCard(c) && c.rank === lastRank
+      );
+      if (hasMatchingRank) {
+        this.state.scores[p.id] = (this.state.scores[p.id] || 0) + 2;
+        p.totalScore = this.state.scores[p.id];
+      }
+    }
+  }
+
+  /**
+   * 連鎖ボーナス: プレイヤーが3回連続パスせずにカードを出したら+3点
+   */
+  private trackChainBonus(playerId: string): void {
+    if (!this.state.activeRules.includes('chain_bonus')) return;
+
+    this.consecutivePlayCounts[playerId] = (this.consecutivePlayCounts[playerId] || 0) + 1;
+
+    if (this.consecutivePlayCounts[playerId] >= 3) {
+      this.state.scores[playerId] = (this.state.scores[playerId] || 0) + 3;
+      this.state.players[playerId].totalScore = this.state.scores[playerId];
+      this.consecutivePlayCounts[playerId] = 0; // リセット
+    }
+  }
+
+  /**
+   * 連鎖ボーナスリセット: パスしたらカウントを0に戻す
+   */
+  private resetChainBonus(playerId: string): void {
+    if (!this.state.activeRules.includes('chain_bonus')) return;
+    this.consecutivePlayCounts[playerId] = 0;
   }
 
   private addStateUpdates(events: GameEvent[]): void {

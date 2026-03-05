@@ -10,7 +10,9 @@
       "Bash(SHELL=/usr/bin/bash npx tsc:*)",
       "Bash(/usr/bin/bash -c \"cd ''/c/Users/haru0/OneDrive/デスクトップ/mygame'' && npx tsc --noEmit 2>&1\")",
       "mcp__Claude_Preview__preview_start",
-      "Bash(where cloudflared)"
+      "Bash(where cloudflared)",
+      "Bash(cmd /c \"cd /d C:\\\\Users\\\\haru0\\\\OneDrive\\\\デスクトップ\\\\mygame && npx tsc --noEmit --project tsconfig.server.json 2>&1\")",
+      "Bash(cmd /c \"cd /d C:\\\\Users\\\\haru0\\\\OneDrive\\\\デスクトップ\\\\mygame && git status\")"
     ]
   }
 }

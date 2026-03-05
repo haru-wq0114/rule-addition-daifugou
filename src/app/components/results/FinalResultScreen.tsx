@@ -1,6 +1,8 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useSocket } from '@/app/components/providers/SocketProvider';
+import { useGameStore } from '@/app/stores/gameStore';
 import type { GameOverData } from '@/app/stores/gameStore';
 
 interface FinalResultScreenProps {
@@ -11,8 +13,17 @@ const RANK_MEDALS = ['🥇', '🥈', '🥉', ''];
 
 export function FinalResultScreen({ data }: FinalResultScreenProps) {
   const router = useRouter();
+  const socket = useSocket();
 
   const handleReturnToLobby = () => {
+    // サーバーにルーム離脱を通知
+    if (socket) {
+      socket.emit('lobby:leave_room');
+    }
+    // ゲーム状態をリセット
+    useGameStore.getState().resetGame();
+    useGameStore.getState().setCurrentRoom(null);
+    useGameStore.getState().setRoomId('');
     router.push('/lobby');
   };
 

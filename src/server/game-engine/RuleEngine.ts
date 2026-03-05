@@ -198,6 +198,12 @@ export class RuleEngine {
       effects.push({ type: 'four_revive', count: 1 });
     }
 
+    // ダイヤドロー: ダイヤ出し→最弱カードを次プレイヤーに渡す
+    if (activeRules.includes('diamond_draw') && playedSuits.includes('diamonds')) {
+      effects.push({ type: 'seven_pass', count: 1 });
+      pendingActions.push({ type: 'seven_pass', playerId: play.playerId, count: 1 });
+    }
+
     // クラブクラッシュ: クラブ3枚以上→場流し
     if (activeRules.includes('club_crush')) {
       const clubCount = playedSuits.filter(s => s === 'clubs').length;
@@ -255,6 +261,17 @@ export class RuleEngine {
     const [daifugouId] = prevDaifugou;
 
     if (finishOrder === 0 && finishedPlayerId !== daifugouId) {
+      // ハートプロテクト: ハートが手札にある限り都落ち無効
+      if (gameState.activeRules.includes('heart_protect')) {
+        const daifugouPlayer = gameState.players[daifugouId];
+        if (daifugouPlayer) {
+          const hasHeart = daifugouPlayer.hand.some(
+            c => isRegularCard(c) && c.suit === 'hearts'
+          );
+          if (hasHeart) return null;
+        }
+      }
+
       return { type: 'capital_fall', playerId: daifugouId };
     }
 
@@ -278,12 +295,6 @@ export class RuleEngine {
     return activeRules.includes('joker_nerf');
   }
 
-  /**
-   * Check no_single rule
-   */
-  isNoSingleActive(activeRules: AdditionalRuleId[]): boolean {
-    return activeRules.includes('no_single');
-  }
 
   /**
    * Update number lock based on play history

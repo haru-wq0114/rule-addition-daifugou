@@ -71,6 +71,11 @@ export class RoomManager {
       return null;
     }
 
+    // If the game was playing/finished, reset the room for a new game
+    if (room.status === 'playing' || room.status === 'finished') {
+      room.resetForNewGame();
+    }
+
     // If host left, assign new host
     if (!room.players.some(p => p.isHost)) {
       const newHost = room.players.find(p => !p.isCpu);

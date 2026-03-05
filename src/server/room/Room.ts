@@ -55,6 +55,18 @@ export class Room {
     this.players = this.players.filter(p => !(p.id === cpuId && p.isCpu));
   }
 
+  resetForNewGame(): void {
+    this.status = 'waiting';
+    this.gameState = null;
+    this.gameEngine = null;
+    // CPUプレイヤーを除去
+    this.players = this.players.filter(p => !p.isCpu);
+    // 全員のready状態をリセット（ホストは常にready）
+    for (const p of this.players) {
+      p.isReady = p.isHost;
+    }
+  }
+
   findPlayerBySocketId(socketId: string): RoomPlayer | undefined {
     return this.players.find(p => p.socketId === socketId);
   }
