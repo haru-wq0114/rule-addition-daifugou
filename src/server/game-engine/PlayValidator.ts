@@ -43,6 +43,14 @@ export class PlayValidator {
       return { valid: false, reason: '無効なカードの組み合わせです。' };
     }
 
+    // 2.5. Sandstorm / Ambulance: special override plays that bypass all field rules
+    if (activeRules.includes('sandstorm') && this.checkSandstorm(cards)) {
+      return { valid: true, playType: 'triple' };
+    }
+    if (activeRules.includes('ambulance') && this.checkAmbulance(cards)) {
+      return { valid: true, playType: 'pair' };
+    }
+
     // 3. If field is empty, almost any valid combination is allowed
     if (!field.currentPlay) {
       // Check suit ban (同種禁止制) if active

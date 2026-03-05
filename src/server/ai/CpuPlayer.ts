@@ -173,6 +173,37 @@ export class CpuPlayer {
       }
     }
 
+    // Sandstorm / Ambulance: special override plays (can be played anytime)
+    if (activeRules.includes('sandstorm')) {
+      const threes = hand.filter(c => isRegularCard(c) && c.rank === 3);
+      if (threes.length >= 3) {
+        const sandstormCards = threes.slice(0, 3);
+        const result = this.validator.validate(sandstormCards, hand, field, activeRules as any);
+        if (result.valid) {
+          plays.push({
+            cards: sandstormCards,
+            playType: 'triple',
+            strength: this.getCardStrength(sandstormCards[0], field.isRevolution),
+          });
+        }
+      }
+    }
+
+    if (activeRules.includes('ambulance')) {
+      const nines = hand.filter(c => isRegularCard(c) && c.rank === 9);
+      if (nines.length >= 2) {
+        const ambulanceCards = nines.slice(0, 2);
+        const result = this.validator.validate(ambulanceCards, hand, field, activeRules as any);
+        if (result.valid) {
+          plays.push({
+            cards: ambulanceCards,
+            playType: 'pair',
+            strength: this.getCardStrength(ambulanceCards[0], field.isRevolution),
+          });
+        }
+      }
+    }
+
     return plays;
   }
 

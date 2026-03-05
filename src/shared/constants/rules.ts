@@ -71,7 +71,7 @@ export const ADDITIONAL_RULES: Record<AdditionalRuleId, AdditionalRuleDefinition
   sandstorm: {
     id: 'sandstorm',
     nameJa: '砂嵐',
-    descriptionJa: '3のカードを3枚出すと場を流せる。',
+    descriptionJa: '3のカードを3枚出すと、いつでも場を流せる。',
     triggerRank: 3,
     triggerCount: 3,
     type: 'field_clear',
@@ -79,7 +79,7 @@ export const ADDITIONAL_RULES: Record<AdditionalRuleId, AdditionalRuleDefinition
   ambulance: {
     id: 'ambulance',
     nameJa: '救急車',
-    descriptionJa: '9のカードを2枚出すと場を流せる。',
+    descriptionJa: '9のカードを2枚出すと、いつでも場を流せる。',
     triggerRank: 9,
     triggerCount: 2,
     type: 'field_clear',
