@@ -172,6 +172,20 @@ export class RuleEngine {
       clearField = true;
     }
 
+    // 3の税金: 3を出すと他全員が最弱カード1枚を自動で捨てる
+    if (activeRules.includes('three_tax') && playRank === 3) {
+      effects.push({ type: 'three_tax' });
+    }
+
+    // 6シャッフル: 6を2枚出すと全員の手札をシャッフルして再配布
+    if (activeRules.includes('six_shuffle') && playRank === 6) {
+      const sixCount = play.cards.filter(c => isRegularCard(c) && c.rank === 6).length;
+      if (sixCount >= 2) {
+        effects.push({ type: 'six_shuffle' });
+        clearField = true;
+      }
+    }
+
     // === 新規スート効果型ルール ===
 
     // スペードブースト: スペード出し→スキップ

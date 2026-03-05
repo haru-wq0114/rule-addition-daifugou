@@ -145,4 +145,7 @@ export type PlayEffect =
   | { type: 'four_revive'; count: number }
   | { type: 'capital_fall'; playerId: string }
   | { type: 'even_odd_violation' }
-  | { type: 'suit_ban_violation' };
+  | { type: 'suit_ban_violation' }
+  | { type: 'three_tax' }
+  | { type: 'six_shuffle' }
+  | { type: 'sudden_death'; playerId: string };

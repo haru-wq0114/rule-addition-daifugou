@@ -239,6 +239,46 @@ export class GameEngine {
       });
     }
 
+    // 3の税金: 他全員が最弱カード1枚を自動で捨てる
+    if (postPlay.effects.some(e => e.type === 'three_tax')) {
+      for (const p of Object.values(this.state.players)) {
+        if (p.id === playerId || p.finishOrder !== null || p.hand.length === 0) continue;
+        // 最弱カードを捨てる（ソート済みの先頭）
+        const sorted = sortCards(p.hand, this.state.field.isRevolution);
+        const weakest = sorted[0];
+        p.hand = removeCardsById(p.hand, [weakest.id]);
+        this.deckManager.addToDiscard([weakest]);
+      }
+    }
+
+    // 6シャッフル: 全員の手札を回収→シャッフル→再配布
+    if (postPlay.effects.some(e => e.type === 'six_shuffle')) {
+      const allCards: AnyCard[] = [];
+      const activePlayerIds: string[] = [];
+      for (const p of Object.values(this.state.players)) {
+        if (p.finishOrder !== null) continue;
+        allCards.push(...p.hand);
+        p.hand = [];
+        activePlayerIds.push(p.id);
+      }
+      // シャッフル
+      for (let i = allCards.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [allCards[i], allCards[j]] = [allCards[j], allCards[i]];
+      }
+      // 再配布
+      for (let i = 0; i < allCards.length; i++) {
+        const pid = activePlayerIds[i % activePlayerIds.length];
+        this.state.players[pid].hand.push(allCards[i]);
+      }
+      // ソート
+      for (const pid of activePlayerIds) {
+        this.state.players[pid].hand = sortCards(
+          this.state.players[pid].hand, this.state.field.isRevolution
+        );
+      }
+    }
+
     // Check if player finished (hand empty)
     if (player.hand.length === 0) {
       const ranking = this.phaseManager.assignRanking(this.state, playerId);
@@ -371,9 +411,49 @@ export class GameEngine {
       data: { playerId },
     });
 
-    // Check if all active (non-finished) players have passed
+    // サドンデス: 残り2人でパスしたら即大貧民
     const activePlayers = Object.values(this.state.players)
       .filter(p => p.finishOrder === null);
+
+    if (this.state.activeRules.includes('sudden_death') && activePlayers.length <= 2) {
+      // パスした人が即負け
+      const ranking = this.phaseManager.assignRanking(this.state, playerId);
+      events.push({
+        type: 'game:player_finished',
+        target: 'all',
+        data: { playerId, ranking },
+      });
+
+      // ラウンド終了チェック
+      if (this.phaseManager.isRoundOver(this.state)) {
+        const roundScores = this.phaseManager.endRound(this.state);
+        events.push({
+          type: 'game:round_end',
+          target: 'all',
+          data: {
+            rankings: Object.fromEntries(
+              Object.values(this.state.players).map(p => [p.id, p.roundRanking])
+            ),
+            roundScores,
+            totalScores: { ...this.state.scores },
+          },
+        });
+
+        if (this.phaseManager.isGameOver(this.state)) {
+          this.state.phase = 'GAME_OVER';
+          events.push({
+            type: 'game:game_over',
+            target: 'all',
+            data: this.buildGameOverData(),
+          });
+        }
+      }
+
+      this.addStateUpdates(events);
+      return events;
+    }
+
+    // Check if all active (non-finished) players have passed
     const allPassed = activePlayers.every(p =>
       p.hasPassedThisTurn || p.id === this.state.field.lastPlayerId
     );
